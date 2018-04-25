@@ -9,13 +9,14 @@ spec:
   containers: 
     - name: "etcd"
       image: "{{.Image}}"
-      args: 
+      args:
+        - "/usr/local/bin/etcd"
         - "--name={{.Name}}"
         - "--advertise-client-urls={{.AdvertiseClientUrls}}"
         - "--listen-client-urls=http://0.0.0.0:2379"
         - "--listen-peer-urls=http://0.0.0.0:2380"
         - "--data-dir=/var/lib/etcd/data"
-        - "--wal-dir=/var/lib/etcd/wal"
+        # - "--wal-dir=/var/lib/etcd/wal"
         - "--election-timeout=1000"
         - "--heartbeat-interval=100"
         - "--snapshot-count=10000"
@@ -49,7 +50,7 @@ spec:
     - name: "etcd-data"
       gcePersistentDisk:
         pdName: {{.DataVolumeId}}
-        fsType: ext4{{else}}
+        fsType: ext4{{else if eq .CloudProvider "gce"}}
     - name: "etcd-wal"
       awsElasticBlockStore:
         volumeID: {{.WalVolumeId}}
@@ -57,5 +58,13 @@ spec:
     - name: "etcd-data"
       awsElasticBlockStore:
         volumeID: {{.DataVolumeId}}
-        fsType: ext4{{end}}
+        fsType: ext4{{else}}
+    - name: "etcd-wal"
+      hostPath:
+        path: /data/etcd-wal
+        type: Directory
+    - name: "etcd-data"
+      hostPath:
+        path: /data/etcd-data
+        type: Directory{{end}}
 `

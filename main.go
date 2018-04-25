@@ -59,7 +59,7 @@ func main() {
 	}
 
 	if config.CloudProvider == "" {
-		log.Fatal("cloud provider required. Supported values: aws, gce.")
+		log.Fatal("cloud provider required. Supported values: aws, gce, baremetal.")
 	}
 
 	initialCluster := make([]string, 0)
@@ -75,7 +75,7 @@ func main() {
 		member.Image = config.Image
 		member.InitialCluster = initialClusterString
 
-		f, err := os.Create(fmt.Sprintf("etcd%d-pod.yaml", i))
+		f, err := os.Create(fmt.Sprintf("etcd%d-pod.yaml", i+1))
 		if err != nil {
 			log.Println(err)
 		}
